@@ -6,7 +6,19 @@
 
 " Author: Stanley Xiao 
 
+" ===
+" " === Auto load for first time uses
+" " ===
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+	silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+						 \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin('~/.config/nvim/plugged')
+
+" Dress up
+Plug 'altercation/vim-colors-solarized'
 
 " Status line
 Plug 'vim-airline/vim-airline'
@@ -31,16 +43,21 @@ Plug 'mzlogin/vim-markdown-toc'
 Plug 'gcmt/wildfire.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'aperezdc/vim-template'
 
 " File navigation
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+Plug 'luukvbaal/nnn.nvim'
 
 " Flutter
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'f-person/pubspec-assist-nvim', { 'for' : ['pubspec.yaml'] }
 
 call plug#end()
+
+lua << EOF
+require("nnn").setup()
+EOF
 
 let mapleader=" "
 
@@ -62,9 +79,16 @@ set softtabstop=5
 set noexpandtab
 set laststatus=2
 set encoding=utf-8
+
+" Dress up
 set termguicolors " enable true colors support
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 set background=dark
+colorscheme solarized
+colors solarized
+hi Pmenu ctermbg=15
+hi PmenuSel ctermbg=15
+hi Pmenu guibg=DarkCyan
 
 " Key config
 noremap <LEADER>c "+y
@@ -77,11 +101,21 @@ nmap zj o<Esc>k
 nmap zk O<Esc>j
 vmap Q gq
 nmap Q gqap
-"
+noremap <LEADER>n <cmd>NnnExplorer<CR>
+nnoremap <LEADER>n <cmd>NnnExplorer %:p:h<CR>
+nnoremap <LEADER>p <cmd>NnnPicker<CR>
+
+
 " Plugins config
 let g:instant_markdown_port=10055
 let g:instant_markdown_autostart=0
 let g:airline_section_x = '%{ScrollStatus()}'
+" Template
+let g:username = 'Stanley Xiao'
+let g:email = "stanley.coder@gmail.com"
+let g:templates_use_licensee = '0'
+
+
 " ===
 " === coc.nvim
 " ===
@@ -111,7 +145,6 @@ let g:coc_global_extensions = [
 	\ 'coc-vimlsp',
 	\ 'coc-yaml',
 	\ 'coc-yank']
-
 
 
 function! s:isAtStartOfLine(mapping)
